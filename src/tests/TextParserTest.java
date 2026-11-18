@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import records.Coordinates;
 import records.Mission;
 import records.RoverSpec;
-import service.RectanglePlateau;
+import Entities.RectanglePlateau;
 import service.TextParser;
 
 import java.util.List;
@@ -55,6 +55,41 @@ class TextParserTest {
                 () -> parser.parse(List.of(badPlateauLine, "1 2 N", "M"))
         );
         assertTrue(ex.getMessage().startsWith("Line 1:"));
+    }
+
+    @ParameterizedTest(name = "Should reject invalid rover position: \"{0}\"")
+    @ValueSource(strings = {
+            "",          // Blank line in the middle
+            "1 2",       // Missing direction
+            "1 2 N E",   // Extra token
+            "A 2 N",     // Non-numeric X
+            "1 B N",     // Non-numeric Y
+            "1 2 X",     // Unknown direction
+            "1 2 n",     // Lowercase direction
+            "1 2 NORTH"  // Full word instead of single letter
+    })
+    void reportsLine2ErrorOnMalformedRoverPosition(String badPositionLine) {
+        InvalidInputException ex = assertThrows(
+                InvalidInputException.class,
+                () -> parser.parse(List.of("5 5", badPositionLine, "M"))
+        );
+        assertTrue(ex.getMessage().startsWith("Line 2:"));
+    }
+
+    @ParameterizedTest(name = "Should reject invalid instructions: \"{0}\"")
+    @ValueSource(strings = {
+            "LMLXM", // Unknown command letter
+            "lrm",   // Lowercase commands
+            "L M",   // Space inside instruction sequence
+            "123",   // Digits instead of commands
+            "L?"     // Special character
+    })
+    void reportsLine3ErrorOnMalformedInstructions(String badInstructionLine) {
+        InvalidInputException ex = assertThrows(
+                InvalidInputException.class,
+                () -> parser.parse(List.of("5 5", "1 2 N", badInstructionLine))
+        );
+        assertTrue(ex.getMessage().startsWith("Line 3:"));
     }
 
     @Test

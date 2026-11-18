@@ -1,6 +1,6 @@
 package records;
 
-import service.Plateau;
+import Entities.Plateau;
 
 import java.util.List;
 

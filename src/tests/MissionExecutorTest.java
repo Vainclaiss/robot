@@ -1,5 +1,8 @@
 package tests;
 
+import Entities.Plateau;
+import Entities.RectanglePlateau;
+import Entities.Rover;
 import enums.Direction;
 import enums.Instruction;
 import org.junit.jupiter.api.DisplayName;
@@ -10,9 +13,6 @@ import records.Coordinates;
 import records.Mission;
 import records.RoverSpec;
 import service.MissionExecutor;
-import service.Plateau;
-import service.RectanglePlateau;
-import service.Rover;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ class MissionExecutorTest {
         Plateau plateau = new RectanglePlateau(5, 5);
         RoverSpec spec = new RoverSpec(new Coordinates(4, 5), Direction.E, List.of(Instruction.M));
 
-        List<Rover> results = new MissionExecutor(new Mission(plateau, List.of(spec))).run();
+        List<Rover> results = new MissionExecutor(new Mission(plateau, List.of(spec))).startMission();
 
         assertEquals(new Coordinates(5, 5), results.get(0).position());
         assertEquals(Direction.E, results.get(0).direction());
@@ -39,7 +39,7 @@ class MissionExecutorTest {
         Plateau plateau = new RectanglePlateau(5, 5);
         RoverSpec spec = new RoverSpec(new Coordinates(2, 3), Direction.S, List.of());
 
-        List<Rover> results = new MissionExecutor(new Mission(plateau, List.of(spec))).run();
+        List<Rover> results = new MissionExecutor(new Mission(plateau, List.of(spec))).startMission();
 
         assertEquals(new Coordinates(2, 3), results.get(0).position());
         assertEquals(Direction.S, results.get(0).direction());
@@ -52,23 +52,29 @@ class MissionExecutorTest {
         RoverSpec outside = new RoverSpec(new Coordinates(6, 2), Direction.N, List.of());
         MissionExecutor executor = new MissionExecutor(new Mission(plateau, List.of(outside)));
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, executor::run);
+        IllegalStateException ex = assertThrows(IllegalStateException.class, executor::startMission);
         assertTrue(ex.getMessage().contains("outside the plateau"));
     }
 
-    @ParameterizedTest(name = "Rejects move {2} from ({0},{1}) that leaves the plateau")
+    @ParameterizedTest(name = "Skips move {2} from ({0},{1}) that would leave the plateau, then turns to {3}")
     @CsvSource({
-            "2, 5, N", // Top mid-edge
-            "5, 2, E", // Right mid-edge
-            "2, 0, S", // Bottom mid-edge
-            "0, 2, W"  // Left mid-edge
+            "2, 5, N, E", // Top mid-edge
+            "5, 2, E, S", // Right mid-edge
+            "2, 0, S, W", // Bottom mid-edge
+            "0, 2, W, N"  // Left mid-edge
     })
-    void throwsWhenRoverMovesOffAnyEdge(int x, int y, Direction direction) {
+    void skipsMoveWhenRoverTriesToLeaveAnyEdge(int x, int y, Direction initialDirection, Direction expectedDirection) {
         Plateau plateau = new RectanglePlateau(5, 5);
-        RoverSpec spec = new RoverSpec(new Coordinates(x, y), direction, List.of(Instruction.M));
+        RoverSpec spec = new RoverSpec(
+                new Coordinates(x, y),
+                initialDirection,
+                List.of(Instruction.M, Instruction.R)
+        );
         MissionExecutor executor = new MissionExecutor(new Mission(plateau, List.of(spec)));
 
-        IllegalStateException ex = assertThrows(IllegalStateException.class, executor::run);
-        assertTrue(ex.getMessage().contains("leaves the plateau"));
+        List<Rover> results = executor.startMission();
+
+        assertEquals(new Coordinates(x, y), results.get(0).position());
+        assertEquals(expectedDirection, results.get(0).direction());
     }
 }

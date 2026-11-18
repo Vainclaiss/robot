@@ -1,7 +1,7 @@
 import exceptions.InvalidInputException;
 import records.Mission;
 import service.MissionExecutor;
-import service.Rover;
+import Entities.Rover;
 import service.TextParser;
 
 import java.io.IOException;
@@ -19,10 +19,11 @@ public final class Main {
         }
 
         try {
+
+            // Pas besoin de fermer le fichier, files.readAllLines ouvre le fichier, lit toutes les lignes et ferme le fichier.
             List<String> lines = Files.readAllLines(Path.of(args[0]));
-            // fermer le fichier (à ne pas oublier) try - catch finally ou try avec parametre
             Mission mission = new TextParser().parse(lines);
-            List<Rover> rovers = new MissionExecutor(mission).run();
+            List<Rover> rovers = new MissionExecutor(mission).startMission();
             rovers.forEach(System.out::println);
         } catch (IOException e) {
             fail("Cannot read file: " + e.getMessage());

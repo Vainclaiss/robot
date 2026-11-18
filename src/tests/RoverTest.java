@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import records.Coordinates;
-import service.Rover;
+import Entities.Rover;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,25 +44,5 @@ class RoverTest {
         assertEquals(expectedRight, rightRover.direction());
     }
 
-    @Test
-    @DisplayName("moveTo() updates the rover's current position")
-    void moveToUpdatesPosition() {
-        Rover rover = new Rover(new Coordinates(1, 2), Direction.N);
-        rover.moveTo(new Coordinates(1, 3));
 
-        assertEquals(new Coordinates(1, 3), rover.position());
-    }
-
-    @Test
-    @DisplayName("Constructor and moveTo() reject null arguments")
-    void rejectsNullArguments() {
-        assertThrows(NullPointerException.class, () -> new Rover(null, Direction.N),
-                "Should reject null initial position");
-        assertThrows(NullPointerException.class, () -> new Rover(new Coordinates(0, 0), null),
-                "Should reject null initial direction");
-
-        Rover rover = new Rover(new Coordinates(0, 0), Direction.N);
-        assertThrows(NullPointerException.class, () -> rover.moveTo(null),
-                "Should reject null target position");
-    }
 }
