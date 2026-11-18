@@ -1,12 +1,19 @@
+package service;
+
+import enums.Instruction;
+import records.Coordinates;
+import records.Mission;
+import records.RoverSpec;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public final class RoverController {
+public final class MissionExecutor {
 
     private final Mission mission;
 
-    public RoverController(Mission mission) {
+    public MissionExecutor(Mission mission) {
         this.mission = Objects.requireNonNull(mission, "Mission must not be null");
     }
 
@@ -22,11 +29,11 @@ public final class RoverController {
     }
 
     private Rover deploy(RoverSpec spec) {
-        if (!mission.plateau().isWithinBounds(spec.start())) {
+        if (!mission.plateau().isWithinBounds(spec.startingPosition())) {
             throw new IllegalArgumentException(
-                    "Initial position " + spec.start() + " is outside the plateau");
+                    "Initial position " + spec.startingPosition() + " is outside the plateau");
         }
-        return new Rover(spec.start(), spec.heading());
+        return new Rover(spec.startingPosition(), spec.direction());
     }
 
     private void execute(Rover rover, List<Instruction> instructions) {

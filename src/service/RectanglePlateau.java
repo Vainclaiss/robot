@@ -1,3 +1,7 @@
+package service;
+
+import records.Coordinates;
+
 public class RectanglePlateau implements Plateau {
 
     private final int maxX;

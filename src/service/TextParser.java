@@ -1,3 +1,12 @@
+package service;
+
+import enums.Direction;
+import enums.Instruction;
+import exceptions.InvalidInputException;
+import records.Coordinates;
+import records.Mission;
+import records.RoverSpec;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +25,7 @@ public final class TextParser {
         Plateau plateau = parsePlateau(lines.get(0));
         List<RoverSpec> rovers = new ArrayList<>();
         for (int i = 1; i < lines.size(); i += 2) {
-            int lineNo = i + 1; // 1-based
+            int lineNo = i + 1;
             rovers.add(parseRover(lines.get(i), lines.get(i + 1), lineNo));
         }
         return new Mission(plateau, rovers);
@@ -25,19 +34,20 @@ public final class TextParser {
     private Plateau parsePlateau(String line) {
         String[] parts = split(line, 2, 1, "maxX maxY");
         try {
+            // Pour l'instant directement service.RectanglePlateau mais sinon un Factory de plateau, si on peut avoir rectangulaire..
             return new RectanglePlateau(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
-        } catch (IllegalArgumentException e) { // covers NumberFormatException too
+        } catch (IllegalArgumentException e) { //
             throw new InvalidInputException("Line 1: invalid plateau '" + line + "'");
         }
     }
 
     private RoverSpec parseRover(String positionLine, String instructionLine, int lineNo) {
-        String[] parts = split(positionLine, 3, lineNo, "x y heading");
+        String[] parts = split(positionLine, 3, lineNo, "x y initialDirection");
         try {
-            Coordinates start = new Coordinates(
+            Coordinates startingPosition = new Coordinates(
                     Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
-            Direction heading = Direction.valueOf(parts[2]);
-            return new RoverSpec(start, heading, parseInstructions(instructionLine, lineNo + 1));
+            Direction initialDirection = Direction.valueOf(parts[2]);
+            return new RoverSpec(startingPosition, initialDirection, parseInstructions(instructionLine, lineNo + 1));
         } catch (IllegalArgumentException e) {
             throw new InvalidInputException(
                     "Line " + lineNo + ": invalid rover '" + positionLine + "'");

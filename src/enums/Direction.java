@@ -1,3 +1,5 @@
+package enums;
+
 public enum Direction {
     N(0, 1),
     E(1, 0),

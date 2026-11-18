@@ -1,3 +1,8 @@
+package service;
+
+import enums.Direction;
+import records.Coordinates;
+
 import java.util.Objects;
 
 public class Rover {
@@ -7,7 +12,7 @@ public class Rover {
 
     public Rover(Coordinates initialPosition, Direction initialDirection) {
         this.position = Objects.requireNonNull(initialPosition, "Position must be non null");
-        this.direction = Objects.requireNonNull(initialDirection, "Direction must be non null");
+        this.direction = Objects.requireNonNull(initialDirection, "enums.Direction must be non null");
     }
 
     public void turnLeft() {
@@ -18,14 +23,17 @@ public class Rover {
         this.direction = this.direction.turnRight();
     }
 
-    // Computes target coordinate without mutating internal state
     public Coordinates nextPosition() {
         return position.move(direction.dx(), direction.dy());
     }
 
-    // Applies the move once the controller validates bounds
     public void moveTo(Coordinates newPosition) {
-        this.position = Objects.requireNonNull(newPosition, "Position must be non null");
+
+        if(newPosition == null) {
+            throw new NullPointerException("Position must be non null");
+        }
+
+        this.position = newPosition;
     }
 
     public Coordinates position() {

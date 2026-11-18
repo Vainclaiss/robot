@@ -1,3 +1,9 @@
+import exceptions.InvalidInputException;
+import records.Mission;
+import service.MissionExecutor;
+import service.Rover;
+import service.TextParser;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +20,7 @@ public final class Main {
         try {
             List<String> lines = Files.readAllLines(Path.of(args[0]));
             Mission mission = new TextParser().parse(lines);
-            List<Rover> rovers = new RoverController(mission).run();
+            List<Rover> rovers = new MissionExecutor(mission).run();
             rovers.forEach(System.out::println);
         } catch (IOException e) {
             fail("Cannot read file: " + e.getMessage());
