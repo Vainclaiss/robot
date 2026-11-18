@@ -35,12 +35,14 @@ public final class TextParser {
         String[] parts = split(line, 2, 1, "maxX maxY");
         try {
             // Pour l'instant directement service.RectanglePlateau mais sinon un Factory de plateau, si on peut avoir rectangulaire..
+            // S'assurer qu'il y'a pas de lettre
             return new RectanglePlateau(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
         } catch (IllegalArgumentException e) { //
             throw new InvalidInputException("Line 1: invalid plateau '" + line + "'");
         }
     }
-
+    // Fait tous les vérifications, s'assure que le Rover est dans une case correcte. (pas dans MissionExecutor)
+    // S'assurer que les lettres sont OK (A-Z)
     private RoverSpec parseRover(String positionLine, String instructionLine, int lineNo) {
         String[] parts = split(positionLine, 3, lineNo, "x y initialDirection");
         try {
@@ -55,25 +57,29 @@ public final class TextParser {
     }
 
     private List<Instruction> parseInstructions(String line, int lineNo) {
+        // verifier les lettres, ya pas de chiffres
         List<Instruction> result = new ArrayList<>();
         for (char c : line.strip().toCharArray()) {
             try {
-                result.add(Instruction.from(c));
+                result.add(Instruction.from(c)); // L , R , M
             } catch (IllegalArgumentException e) {
                 throw new InvalidInputException("Line " + lineNo + ": " + e.getMessage());
             }
         }
         return result;
     }
-
+    // A refaire verifyandSplit -- on peut le mettre dans split()
     private String[] split(String line, int expected, int lineNo, String format) {
         String[] parts = line.strip().split("\\s+");
         if (parts.length != expected) {
             throw new InvalidInputException(
                     "Line " + lineNo + ": expected '" + format + "' but got '" + line + "'");
+
         }
         return parts;
     }
+
+    // Utiliser les méthodes prédifinies de StringBuffer ou String
 
     private List<String> withoutTrailingBlanks(List<String> lines) {
         int end = lines.size();

@@ -12,6 +12,7 @@ import java.util.List;
 public final class Main {
 
     public static void main(String[] args) {
+
         if (args.length != 1) {
             System.err.println("Usage: java -jar rover.jar <input-file>");
             System.exit(1);
@@ -19,6 +20,7 @@ public final class Main {
 
         try {
             List<String> lines = Files.readAllLines(Path.of(args[0]));
+            // fermer le fichier (à ne pas oublier) try - catch finally ou try avec parametre
             Mission mission = new TextParser().parse(lines);
             List<Rover> rovers = new MissionExecutor(mission).run();
             rovers.forEach(System.out::println);

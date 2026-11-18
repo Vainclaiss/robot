@@ -7,6 +7,8 @@ import java.util.Objects;
 
 public class Rover {
 
+    // Entities -- Rover - Plateau
+
     private Coordinates position;
     private Direction direction;
 
@@ -17,6 +19,8 @@ public class Rover {
 
     public void turnLeft() {
         this.direction = this.direction.turnLeft();
+
+
     }
 
     public void turnRight() {

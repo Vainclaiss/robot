@@ -17,6 +17,7 @@ public final class MissionExecutor {
         this.mission = Objects.requireNonNull(mission, "Mission must not be null");
     }
 
+    //
 
     public List<Rover> run() {
         List<Rover> results = new ArrayList<>();
@@ -28,29 +29,41 @@ public final class MissionExecutor {
         return results;
     }
 
+
     private Rover deploy(RoverSpec spec) {
+
         if (!mission.plateau().isWithinBounds(spec.startingPosition())) {
             throw new IllegalArgumentException(
                     "Initial position " + spec.startingPosition() + " is outside the plateau");
         }
         return new Rover(spec.startingPosition(), spec.direction());
     }
-
+    // ajouter ici le plateau comme parametre
     private void execute(Rover rover, List<Instruction> instructions) {
         for (Instruction instruction : instructions) {
             switch (instruction) {
                 case L -> rover.turnLeft();
                 case R -> rover.turnRight();
-                case M -> move(rover);
+                case M -> validateMove(rover);
             }
         }
     }
 
-    private void move(Rover rover) {
-        Coordinates next = rover.nextPosition();
-        if (!mission.plateau().isWithinBounds(next)) {
-            throw new IllegalStateException("Move to " + next + " leaves the plateau");
-        }
-        rover.moveTo(next);
-    }
+    // Si le rover sort du plateau, j'arrête l'execution
+
+    // Mentionner les cas (être sur la même case ou pas) , arrête le programme si on sort du plateau.
+
+//    private void validateMove(Rover rover) {
+//
+//
+//
+//        if (!mission.plateau().isWithinBounds(next)) {
+//            throw new IllegalStateException("Move to " + next + " leaves the plateau");
+//        }
+//        position newPosition = rover.moveTo(next);
+//
+//    }
+    // rover.moveTo(next) -> prochaine position
+
+
 }
